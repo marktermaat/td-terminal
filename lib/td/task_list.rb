@@ -19,6 +19,12 @@ module Td
       list
     end
 
+    def delete_task(task_number)
+      @tasks = @tasks.delete_if {|t| t.id.to_s == task_number.to_s}
+      sort_tasks
+      list
+    end
+
     private
     def sort_tasks
       @tasks = @tasks

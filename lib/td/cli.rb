@@ -28,5 +28,11 @@ module Td
       end
       @task_list.add_task(topic, args.join(' '))
     end
+
+    desc "del TASK_NUMBER", "deletes a task"
+    method_options aliases: [:d, :delete]
+    def delete(task_number)
+      @task_list.delete_task(task_number)
+    end
   end
 end
