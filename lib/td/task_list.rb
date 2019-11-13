@@ -20,12 +20,25 @@ module Td
     end
 
     def delete_task(task_number)
-      @tasks = @tasks.delete_if {|t| t.id.to_s == task_number.to_s}
+      task = find_task(task_number)
+      @tasks.delete(task)
       sort_tasks
+      @io.write_tasks(@tasks)
+      list
+    end
+
+    def edit_task(task_number, description)
+      task = find_task(task_number)
+      task.description = description
+      @io.write_tasks(@tasks)
       list
     end
 
     private
+    def find_task(task_number)
+      @tasks.find {|t| t.id.to_s == task_number.to_s}
+    end
+
     def sort_tasks
       @tasks = @tasks
                    .group_by { |t| t.topic}
