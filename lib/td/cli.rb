@@ -1,43 +1,70 @@
-require 'thor'
 require_relative 'task_list'
 require_relative 'io'
 require_relative 'presenter'
-# TODO: Initialize task_list with IO
 
 module Td
-  class Cli < Thor
-    def initialize(*args)
-      super
+  class Cli
+    PROMPT = '> '
+    ADD_HIST = true
+
+    def initialize()
       @io = Td::Io.new
       @presenter = Td::Presenter.new
       @task_list = Td::TaskList.new(@io, @presenter)
     end
 
-    desc "list", "list all tasks"
-    method_options aliases: :l
+    def start
+      list
+      while input = Readline.readline(PROMPT, ADD_HIST)
+        command, *args = input.split(' ')
+        next if command.empty?
+
+        case command
+        when 'h', 'help' then help
+        when 'l', 'list' then list
+        when 'a', 'add' then add(args)
+        when 'd', 'del', 'delete' then delete(args)
+        when 'e', 'edit' then edit(args)
+        when 'q', 'quit', 'exit' then exit(0)
+        end
+      end
+    end
+
+    def help
+      puts ' - l/list - List all tasks'
+      puts ' - a/add @TOPIC TASK_DESCRIPTION - Add a new task'
+      puts ' - d/del TASK_NUMBER - Deletes a task'
+      puts ' - e/edit TASK_NUMBER TASK_DESCRIPTION - Edits a task'
+    end
+
     def list
       @task_list.list
     end
 
-    desc "add @TOPIC TASK_DESCRIPTION", "add a new task"
-    method_options aliases: :a
-    def add(topic, *args)
+    def add(args)
+      if args.length <= 1
+        puts "Incorrect usage. Use 'a/add @TOPIC TASK_DESCRIPTION - Add a new task'"
+      end
+      topic, *description = args
       unless topic.start_with?('@')
-        args.unshift(topic)
+        description.unshift(topic)
         topic = nil
       end
-      @task_list.add_task(topic, args.join(' '))
+      @task_list.add_task(topic, description.join(' '))
     end
 
-    desc "del TASK_NUMBER", "delete a task"
-    method_options aliases: [:d, :delete]
-    def delete(task_number)
-      @task_list.delete_task(task_number)
+    def delete(args)
+      if args.length != 1
+        puts "Incorrect usage. Use 'd/del TASK_NUMBER - Deletes a task'"
+      end
+      @task_list.delete_task(args.first)
     end
 
-    desc "edit TASK_NUMBER TASK_DESCRIPTION", "edit a task"
-    method_options aliases: :e
-    def edit(task_number, *args)
+    def edit(args)
+      if args.length <= 1
+        puts "Incorrect usage. Use 'e/edit TASK_NUMBER TASK_DESCRIPTION - Edits a task'"
+      end
+      task_number, *description = args
       @task_list.edit_task(task_number, args.join(' '))
     end
   end
