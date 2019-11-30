@@ -1,3 +1,5 @@
+require 'readline'
+
 require_relative 'task_list'
 require_relative 'io'
 require_relative 'presenter'
@@ -42,8 +44,9 @@ module Td
     end
 
     def add(args)
-      if args.length <= 1
-        puts "Incorrect usage. Use 'a/add @TOPIC TASK_DESCRIPTION - Add a new task'"
+      if args.length < 1
+        puts "Incorrect usage. Use 'a/add (@TOPIC) TASK_DESCRIPTION - Add a new task'"
+        return
       end
       topic, *description = args
       unless topic.start_with?('@')
@@ -56,6 +59,7 @@ module Td
     def delete(args)
       if args.length != 1
         puts "Incorrect usage. Use 'd/del TASK_NUMBER - Deletes a task'"
+        return
       end
       @task_list.delete_task(args.first)
     end
@@ -63,6 +67,7 @@ module Td
     def edit(args)
       if args.length <= 1
         puts "Incorrect usage. Use 'e/edit TASK_NUMBER TASK_DESCRIPTION - Edits a task'"
+        return
       end
       task_number, *description = args
       @task_list.edit_task(task_number, args.join(' '))
