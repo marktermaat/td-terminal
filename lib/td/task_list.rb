@@ -34,6 +34,17 @@ module Td
       list
     end
 
+    def add_note(task_number, note)
+      task = find_task(task_number)
+      if task.nil?
+        puts "Task '#{task_number}' not found."
+        return
+      end
+      task.notes << note
+      @io.write_tasks(@tasks)
+      list
+    end
+
     private
     def find_task(task_number)
       @tasks.find {|t| t.id.to_s == task_number.to_s}

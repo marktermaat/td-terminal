@@ -27,6 +27,7 @@ module Td
         when 'a', 'add' then add(args)
         when 'd', 'del', 'delete' then delete(args)
         when 'e', 'edit' then edit(args)
+        when 'n', 'note' then note(args)
         when 'q', 'quit', 'exit' then exit(0)
         end
       end
@@ -37,6 +38,7 @@ module Td
       puts ' - a/add @TOPIC TASK_DESCRIPTION - Add a new task'
       puts ' - d/del TASK_NUMBER - Deletes a task'
       puts ' - e/edit TASK_NUMBER TASK_DESCRIPTION - Edits a task'
+      puts ' - n/note TASK_NUMBER NOTE - Add a note to a task'
     end
 
     def list
@@ -45,20 +47,20 @@ module Td
 
     def add(args)
       if args.length < 1
-        puts "Incorrect usage. Use 'a/add (@TOPIC) TASK_DESCRIPTION - Add a new task'"
+        puts "Incorrect usage. Use 'a/add (@TOPIC) TASK_DESCRIPTION'"
         return
       end
       topic, *description = args
       unless topic.start_with?('@')
         description.unshift(topic)
-        topic = nil
+        topic = "@uncategorized"
       end
       @task_list.add_task(topic, description.join(' '))
     end
 
     def delete(args)
       if args.length != 1
-        puts "Incorrect usage. Use 'd/del TASK_NUMBER - Deletes a task'"
+        puts "Incorrect usage. Use 'd/del TASK_NUMBER'"
         return
       end
       @task_list.delete_task(args.first)
@@ -66,11 +68,20 @@ module Td
 
     def edit(args)
       if args.length <= 1
-        puts "Incorrect usage. Use 'e/edit TASK_NUMBER TASK_DESCRIPTION - Edits a task'"
+        puts "Incorrect usage. Use 'e/edit TASK_NUMBER TASK_DESCRIPTION'"
         return
       end
       task_number, *description = args
       @task_list.edit_task(task_number, args.join(' '))
+    end
+
+    def note(args)
+      if args.length <= 1
+        puts "Incorrect usage. Use 'n/note TASK_NUMBER NOTE'"
+        return
+      end
+      task_number, *note = args
+      @task_list.add_note(task_number, note.join(' '))
     end
   end
 end
