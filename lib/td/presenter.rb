@@ -30,7 +30,7 @@ module Td
       puts "#{@pastel.white.dim.on_black(task.id.to_s + '.')} #{checkbox} #{@pastel.bright_white.on_black(task.description)}"
 
       task.notes.each_with_index do |note, index|
-        puts "   #{@pastel.yellow.dim.on_black(task.id.to_s + '.' + (index+1).to_s + '.')} #{@pastel.bright_yellow.dim.on_black(note)}"
+        puts "       #{@pastel.yellow.dim.on_black(task.id.to_s + '.' + (index+1).to_s + '.')} #{@pastel.bright_yellow.dim.on_black(note)}"
       end
     end
   end

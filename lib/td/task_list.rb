@@ -1,4 +1,5 @@
 require_relative 'task'
+require_relative 'command_error'
 
 module Td
   class TaskList
@@ -58,7 +59,7 @@ module Td
     private
     def find_task(task_number)
       task = @tasks.find {|t| t.id.to_s == task_number.to_s}
-      raise StandardError.new "Task '#{task_number}' not found." if task.nil?
+      raise Td::CommandError.new "Task '#{task_number}' not found." if task.nil?
       task
     end
 

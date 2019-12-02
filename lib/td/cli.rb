@@ -3,6 +3,7 @@ require 'readline'
 require_relative 'task_list'
 require_relative 'io'
 require_relative 'presenter'
+require_relative 'command_error'
 
 module Td
   class Cli
@@ -32,11 +33,13 @@ module Td
           when 'n', 'note' then note(args)
           when 'q', 'quit', 'exit' then exit(0)
           end
-        rescue StandardError => e
+        rescue CommandError => e
           puts e.message
         end
       end
     end
+
+    private
 
     def help
       puts ' - l/list - List all tasks'
@@ -52,19 +55,13 @@ module Td
     end
 
     def start_task(args)
-      if args.length != 1
-        puts "Incorrect usage. Use 's/start TASK_NUMBER'"
-        return
-      end
+      validate_args(args, 1, 1, "Incorrect usage. Use 's/start TASK_NUMBER'")
       task_number = args[0]
       @task_list.start_task(task_number)
     end
 
     def add(args)
-      if args.length < 1
-        puts "Incorrect usage. Use 'a/add (@TOPIC) TASK_DESCRIPTION'"
-        return
-      end
+      validate_args(args, 2, nil, "Incorrect usage. Use 'a/add (@TOPIC) TASK_DESCRIPTION'")
       topic, *description = args
       unless topic.start_with?('@')
         description.unshift(topic)
@@ -74,29 +71,26 @@ module Td
     end
 
     def delete(args)
-      if args.length != 1
-        puts "Incorrect usage. Use 'd/del TASK_NUMBER'"
-        return
-      end
+      validate_args(args, 1, 1, "Incorrect usage. Use 'd/del TASK_NUMBER'")
       @task_list.delete_task(args.first)
     end
 
     def edit(args)
-      if args.length <= 1
-        puts "Incorrect usage. Use 'e/edit TASK_NUMBER TASK_DESCRIPTION'"
-        return
-      end
+      validate_args(args, 2, nil, "Incorrect usage. Use 'e/edit TASK_NUMBER TASK_DESCRIPTION'")
       task_number, *description = args
       @task_list.edit_task(task_number, description.join(' '))
     end
 
     def note(args)
-      if args.length <= 1
-        puts "Incorrect usage. Use 'n/note TASK_NUMBER NOTE'"
-        return
-      end
+      validate_args(args, 2, nil, "Incorrect usage. Use 'n/note TASK_NUMBER NOTE'")
       task_number, *note = args
       @task_list.add_note(task_number, note.join(' '))
+    end
+
+    def validate_args(args, min, max, usage)
+      if args.length < min || (!max.nil? && args.length > max)
+        raise Td::CommandError.new(usage)
+      end
     end
   end
 end
