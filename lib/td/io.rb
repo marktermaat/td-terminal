@@ -15,7 +15,7 @@ module Td
       return [] unless File.file?(@file)
       id = 0
       content = JSON.parse(File.read(@file), symbolize_keys: true)
-      content.map { |task| Td::Task.new(id += 1, task['topic'], task['description'], task['created_at'], task['notes']) }
+      content.map { |task| Td::Task.new(id += 1, task['topic'], task['description'], task['created_at'], task['notes'], task['doing']) }
     end
 
     def write_tasks(tasks)

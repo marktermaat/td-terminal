@@ -12,42 +12,59 @@ module Td
       @presenter.present_tasks(@tasks)
     end
 
+    def start_task(task_number)
+      task = find_task(task_number)
+      task.doing = true
+      update_and_show_tasks
+    end
+
     def add_task(topic, description)
       @tasks << Td::Task.new(nil, topic, description)
       sort_tasks
-      @io.write_tasks(@tasks)
-      list
+      update_and_show_tasks
     end
 
     def delete_task(task_number)
-      task = find_task(task_number)
-      @tasks.delete(task)
-      sort_tasks
-      @io.write_tasks(@tasks)
-      list
+      if task_number.include?('.')
+        task_number, note_number = task_number.split('.')
+        task = find_task(task_number)
+        task.notes.delete_at(note_number.to_i - 1)
+      else
+        task = find_task(task_number)
+        @tasks.delete(task)
+        sort_tasks
+      end
+      update_and_show_tasks
     end
 
     def edit_task(task_number, description)
-      task = find_task(task_number)
-      task.description = description
-      @io.write_tasks(@tasks)
-      list
+      if task_number.include?('.')
+        task_number, note_number = task_number.split('.')
+        task = find_task(task_number)
+        task.notes[note_number.to_i - 1] = description
+      else
+        task = find_task(task_number)
+        task.description = description
+      end
+      update_and_show_tasks
     end
 
     def add_note(task_number, note)
       task = find_task(task_number)
-      if task.nil?
-        puts "Task '#{task_number}' not found."
-        return
-      end
       task.notes << note
-      @io.write_tasks(@tasks)
-      list
+      update_and_show_tasks
     end
 
     private
     def find_task(task_number)
-      @tasks.find {|t| t.id.to_s == task_number.to_s}
+      task = @tasks.find {|t| t.id.to_s == task_number.to_s}
+      raise StandardError.new "Task '#{task_number}' not found." if task.nil?
+      task
+    end
+
+    def update_and_show_tasks
+      @io.write_tasks(@tasks)
+      list
     end
 
     def sort_tasks

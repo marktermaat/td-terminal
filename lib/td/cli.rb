@@ -21,20 +21,26 @@ module Td
         command, *args = input.split(' ')
         next if command.empty?
 
-        case command
-        when 'h', 'help' then help
-        when 'l', 'list' then list
-        when 'a', 'add' then add(args)
-        when 'd', 'del', 'delete' then delete(args)
-        when 'e', 'edit' then edit(args)
-        when 'n', 'note' then note(args)
-        when 'q', 'quit', 'exit' then exit(0)
+        begin
+          case command
+          when 'h', 'help' then help
+          when 'l', 'list' then list
+          when 's', 'start' then start_task(args)
+          when 'a', 'add' then add(args)
+          when 'd', 'del', 'delete' then delete(args)
+          when 'e', 'edit' then edit(args)
+          when 'n', 'note' then note(args)
+          when 'q', 'quit', 'exit' then exit(0)
+          end
+        rescue StandardError => e
+          puts e.message
         end
       end
     end
 
     def help
       puts ' - l/list - List all tasks'
+      puts ' - s/start - Start a task'
       puts ' - a/add @TOPIC TASK_DESCRIPTION - Add a new task'
       puts ' - d/del TASK_NUMBER - Deletes a task'
       puts ' - e/edit TASK_NUMBER TASK_DESCRIPTION - Edits a task'
@@ -43,6 +49,15 @@ module Td
 
     def list
       @task_list.list
+    end
+
+    def start_task(args)
+      if args.length != 1
+        puts "Incorrect usage. Use 's/start TASK_NUMBER'"
+        return
+      end
+      task_number = args[0]
+      @task_list.start_task(task_number)
     end
 
     def add(args)
@@ -72,7 +87,7 @@ module Td
         return
       end
       task_number, *description = args
-      @task_list.edit_task(task_number, args.join(' '))
+      @task_list.edit_task(task_number, description.join(' '))
     end
 
     def note(args)
