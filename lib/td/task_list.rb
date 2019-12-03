@@ -19,6 +19,18 @@ module Td
       update_and_show_tasks
     end
 
+    def pause_task(task_number)
+      task = find_task(task_number)
+      task.events << {'action' => 'pause', 'timestamp' => Time.now.utc.to_s}
+      update_and_show_tasks
+    end
+
+    def finish_task(task_number)
+      task = find_task(task_number)
+      task.events << {'action' => 'done', 'timestamp' => Time.now.utc.to_s}
+      update_and_show_tasks
+    end
+
     def add_task(topic, description)
       @tasks << Td::Task.new(nil, topic, description)
       sort_tasks
@@ -54,6 +66,10 @@ module Td
       task = find_task(task_number)
       task.notes << note
       update_and_show_tasks
+    end
+
+    def get_started_task()
+      @tasks.find {|t| t.doing?}
     end
 
     private

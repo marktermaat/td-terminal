@@ -27,7 +27,11 @@ module Td
 
     def present_task(task)
       checkbox = task.doing? ? @pastel.bright_yellow.bold.on_black('[*]') : '[ ]'
-      puts "#{@pastel.white.dim.on_black(task.id.to_s + '.')} #{checkbox} #{@pastel.bright_white.on_black(task.description)}"
+      if task.done?
+        puts "#{@pastel.white.dim.on_black(task.id.to_s + '.')} [X] #{@pastel.bright_white.strikethrough.on_black(task.description)}"
+      else
+        puts "#{@pastel.white.dim.on_black(task.id.to_s + '.')} #{checkbox} #{@pastel.bright_white.on_black(task.description)}"
+      end
 
       task.notes.each_with_index do |note, index|
         puts "       #{@pastel.yellow.dim.on_black(task.id.to_s + '.' + (index+1).to_s + '.')} #{@pastel.bright_yellow.dim.on_black(note)}"

@@ -16,9 +16,19 @@ module Td
     end
 
     def doing?
+      last_action == 'start'
+    end
+
+    def done?
+      last_action == 'done'
+    end
+
+    private
+
+    def last_action
       last_event = events.last
       return false if last_event.nil?
-      return last_event['action'] == 'start'
+      return last_event['action']
     end
   end
 end

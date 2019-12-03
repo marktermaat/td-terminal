@@ -27,6 +27,8 @@ module Td
           when 'h', 'help' then help
           when 'l', 'list' then list
           when 's', 'start' then start_task(args)
+          when 'p', 'pause' then pause_task(args)
+          when 'f', 'finish' then finish_task(args)
           when 'a', 'add' then add(args)
           when 'd', 'del', 'delete' then delete(args)
           when 'e', 'edit' then edit(args)
@@ -43,7 +45,9 @@ module Td
 
     def help
       puts ' - l/list - List all tasks'
-      puts ' - s/start - Start a task'
+      puts ' - s/start TASK_NUMBER- Start a task'
+      puts ' - p/pause (TASK_NUMBER) - Pause a task'
+      puts ' - f/finish TASK_NUMBER - Finish a task'
       puts ' - a/add @TOPIC TASK_DESCRIPTION - Add a new task'
       puts ' - d/del TASK_NUMBER - Deletes a task'
       puts ' - e/edit TASK_NUMBER TASK_DESCRIPTION - Edits a task'
@@ -58,6 +62,19 @@ module Td
       validate_args(args, 1, 1, "Incorrect usage. Use 's/start TASK_NUMBER'")
       task_number = args[0]
       @task_list.start_task(task_number)
+    end
+
+    def pause_task(args)
+      validate_args(args, 0, 1, "Incorrect usage. Use 'p/pause (TASK_NUMBER)'")
+      task_number = args[0] || @task_list.get_started_task&.id
+      raise Td::CommandError.new('No started task found.') if task_number.nil?
+      @task_list.pause_task(task_number)
+    end
+
+    def finish_task(args)
+      validate_args(args, 0, 1, "Incorrect usage. Use 'f/finish TASK_NUMBER'")
+      task_number = args[0]
+      @task_list.finish_task(task_number)
     end
 
     def add(args)
