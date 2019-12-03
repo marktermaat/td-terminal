@@ -15,7 +15,7 @@ module Td
 
     def start_task(task_number)
       task = find_task(task_number)
-      task.doing = true
+      task.events << {'action' => 'start', 'timestamp' => Time.now.utc.to_s}
       update_and_show_tasks
     end
 
